@@ -128,10 +128,10 @@ class _HomeScreenState extends State<HomeScreen> {
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Text('Total Balance: $selectedCurrency ${totalMoney.toStringAsFixed(2)}',
+          Text('Total Balance: ${totalMoney.toStringAsFixed(2)} $selectedCurrency',
               style: Theme.of(context).textTheme.headlineMedium),
-          Text('Level: $level | XP: $xp/100', style: const TextStyle(fontSize: 18, color: Colors.black54)),
-          const SizedBox(height: 40),
+          Text('Level: $level | XP: $xp/100', style: const TextStyle(fontSize: 18, color: Color.fromARGB(255, 133, 142, 146))),
+          const SizedBox(height: 50),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -146,7 +146,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 },
                 child: const Text('+'),
               ),
-              const SizedBox(width: 15),
+              const SizedBox(width: 75),
               ElevatedButton(
                 onPressed: () {
                   Navigator.push(

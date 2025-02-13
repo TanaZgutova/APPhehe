@@ -5,7 +5,7 @@ class SettingsScreen extends StatelessWidget {
   final Function(String) changeCurrency;
 
   // ✅ **Fixed: Make currencies list const**
-  static const List<String> currencies = ["USD", "EUR", "GBP", "JPY", "INR"];
+  static const List<String> currencies = ["USD", "EUR", "GBP", "CZK"];
 
   const SettingsScreen({super.key, required this.toggleDarkMode, required this.changeCurrency});
 
@@ -27,7 +27,7 @@ class SettingsScreen extends StatelessWidget {
           const Divider(),
           const Text("Select Currency", style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
           DropdownButton<String>(
-            value: "USD",
+            value: 'EUR',
             onChanged: (String? newValue) {
               changeCurrency(newValue!);
             },

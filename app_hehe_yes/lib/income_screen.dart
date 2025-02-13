@@ -11,13 +11,13 @@ class IncomeScreen extends StatefulWidget {
 
 class _IncomeScreenState extends State<IncomeScreen> {
   final TextEditingController amountController = TextEditingController();
-  final List<String> categories = ["Salary", "Freelance", "Investments", "Gifts", "Bonuses", "Side Hustles"];
+  final List<String> categories = ["Salary", "Freelance", "Investments", "Gifts", "Bonuses", "Side Hustles", "Other"];
   String selectedCategory = "Salary";
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Add Income"), backgroundColor: Colors.green),
+      appBar: AppBar(title: const Text("Add Income"), backgroundColor: const Color.fromARGB(255, 147, 179, 85)),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(

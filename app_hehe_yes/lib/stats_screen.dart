@@ -19,7 +19,7 @@ class StatsScreen extends StatelessWidget {
     }
 
     return Scaffold(
-      appBar: AppBar(title: const Text("Spending Stats"), backgroundColor: const Color.fromARGB(255, 79, 214, 160)),
+      appBar: AppBar(title: const Text("Spending Stats"), backgroundColor: const Color.fromARGB(255, 136, 164, 177)),
       body: Center(
        
         child: categoryTotals.isEmpty

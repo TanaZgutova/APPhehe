@@ -17,7 +17,7 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Add Expense"), backgroundColor: Colors.red),
+      appBar: AppBar(title: const Text("Add Expense"), backgroundColor: const Color.fromARGB(255, 235, 103, 52)),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
