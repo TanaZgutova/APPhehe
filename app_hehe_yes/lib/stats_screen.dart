@@ -17,24 +17,29 @@ class StatsScreen extends StatelessWidget {
             (categoryTotals[transaction["category"]] ?? 0) + transaction["amount"];
       }
     }
-
+    var chartWidth = MediaQuery.of(context).size.width * 0.8;
+    var chartHeight = MediaQuery.of(context).size.height * 0.8;
     return Scaffold(
       appBar: AppBar(title: const Text("Spending Stats"), backgroundColor: const Color.fromARGB(255, 136, 164, 177)),
       body: Center(
        
         child: categoryTotals.isEmpty
             ? const Text("No expenses yet!", style: TextStyle(fontSize: 20))
-            : PieChart(
-                PieChartData(
-                  sections: categoryTotals.entries.map((entry) {
-                    return PieChartSectionData(
-                      value: entry.value,
-                      title: '${entry.key}: \$${entry.value.toStringAsFixed(2)}',
-                      radius: 40,
-                    );
-                  }).toList(),
+            : 
+            ConstrainedBox(
+                constraints: BoxConstraints(maxHeight: chartHeight, maxWidth: chartWidth),// change this line to affect the size !!
+              child: PieChart(
+                  PieChartData(
+                    sections: categoryTotals.entries.map((entry) {
+                      return PieChartSectionData(
+                        value: entry.value,
+                        title: '${entry.key}: \$${entry.value.toStringAsFixed(2)}',
+                        radius: 40,
+                      );
+                    }).toList(),
+                  ),
                 ),
-              ),
+            ),
       ),
     );
   }
