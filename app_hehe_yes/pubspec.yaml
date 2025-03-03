@@ -30,7 +30,9 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-
+  drift: ^2.0.0  # Latest version of Drift
+  sqlite3: ^2.0.0  # SQLite3 package required for Drift
+  path_provider: ^2.0.0  # For getting the correct file path on the device
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8
@@ -39,7 +41,8 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
-
+  drift_dev: ^2.0.0  # Drift code generation package
+  build_runner: ^2.0.0  # Code generation tool
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
   # activated in the `analysis_options.yaml` file located at the root of your
