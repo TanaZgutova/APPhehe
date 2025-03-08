@@ -1,4 +1,9 @@
 import 'package:drift/drift.dart';
+import 'package:drift/native.dart';
+import 'package:path/path.dart' as p;
+import 'package:path_provider/path_provider.dart';
+import 'static_data.dart';
+import 'dart:io';
 part 'app_database.g.dart';
 
 @DataClassName('UserData')
@@ -75,7 +80,19 @@ class Logins extends Table {
 
 @DriftDatabase(tables: [Users, Transactions, Achievements, Friendships, Logins])
 class AppDatabase extends _$AppDatabase {
-  AppDatabase(QueryExecutor e) : super(e);
+  static final _instance = AppDatabase._internal();
+
+  AppDatabase._internal() : super(_openConnection());
+
+  factory AppDatabase() => _instance;
+
+  static LazyDatabase _openConnection() {
+    return LazyDatabase(() async {
+      final dbFolder = await getApplicationDocumentsDirectory();
+      final file = File(p.join(dbFolder.path, 'app.db')); // Database file path
+      return NativeDatabase(file); // Returns a database connection
+    });
+  }
 
   @override
   int get schemaVersion => 1;
@@ -120,6 +137,7 @@ class AppDatabase extends _$AppDatabase {
   Future<int> inserTransaction(TransactionHistory userTransaction) async {
     final retVal =
         await into(transactions).insert(userTransaction.toCompanion(true));
+
     return retVal;
   }
 
@@ -176,8 +194,17 @@ class AppDatabase extends _$AppDatabase {
       if (lastUserLoginDate == null ||
           lastUserLoginDate.date.day != DateTime.now().day) {
         into(logins).insert(LoginsCompanion(userID: Value(user.userID)));
-      }
 
+        final userLoginStreak = await getUserLoginStreak(user.userID);
+        final newAchivements = AchievementList.checkStreakAchievements(
+            (val) => userLoginStreak > val);
+        final achData = newAchivements.map((data) => AchievementsCompanion(
+            achievementIndex: Value(data), userID: Value(user.userID)));
+        await batch((batch) {
+          batch.insertAll(achievements, achData,
+              mode: InsertMode.insertOrIgnore);
+        });
+      }
       return user;
     });
   }
