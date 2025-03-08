@@ -33,6 +33,7 @@ dependencies:
   drift: ^2.0.0  # Latest version of Drift
   sqlite3: ^2.0.0  # SQLite3 package required for Drift
   path_provider: ^2.0.0  # For getting the correct file path on the device
+  path: ^1.8.0
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8

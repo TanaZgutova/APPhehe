@@ -1,41 +1,69 @@
-
 class AchievementData {
-  late final String name;
-  late final String description;
-  late final Function predicate;
+  final String name;
+  final String description;
+  final double thresholdValue;
 
   AchievementData({
-    required name,
-    required description,
-    required predicate,
+    required this.name,
+    required this.description,
+    required this.thresholdValue,
   });
 }
 
 class AchievementList {
-  static final List<AchievementData> _achievements = [];
+  static const List<AchievementData> _achievements = [];
+  static final _streakAchievements = _achievements.sublist(1, 5);
+  static final _savingAhcivements = _achievements.sublist(6, 9);
   AchievementList._();
 
-  List<AchievementData> getAchiemventData() {
+  static List<AchievementData> getAchiemventData() {
     return _achievements;
   }
 
-  AchievementData getAchievementAt(int index) {
+  static AchievementData getAchievementAt(int index) {
     return _achievements[index];
+  }
+
+  static List<AchievementData> getStreakAchievements() {
+    return _streakAchievements;
+  }
+
+  static List<AchievementData> getSavingAchievements() {
+    return _savingAhcivements;
+  }
+
+  static List<int> _checkAchievements(
+      List<AchievementData> achList, bool Function(double) predicate) {
+    List<int> completedAchivements = [];
+    for (var achIdx = 0; achIdx < _achievements.length; achIdx++) {
+      if (predicate(_achievements[achIdx].thresholdValue)) {
+        completedAchivements.add(achIdx);
+      }
+    }
+    return completedAchivements;
+  }
+
+  static List<int> checkStreakAchievements(bool Function(double) predicate) {
+    return _checkAchievements(_streakAchievements, predicate);
+  }
+
+  static List<int> checkSavingsAchievements(bool Function(double) predicate) {
+    return _checkAchievements(_savingAhcivements, predicate);
   }
 }
 
 class CurrencyData {
-  late final String name;
-  late final String displayName;
+  final String name;
+  final String displayName;
 
   CurrencyData({
-    required name,
-    required displayName,
+    required this.name,
+    required this.displayName,
   });
 }
 
 class CurrencyList {
-  static final List<CurrencyData> _currencies = [];
+  static const List<CurrencyData> _currencies = [];
   CurrencyList._();
 
   List<CurrencyData> getCurrencies() {
@@ -48,13 +76,13 @@ class CurrencyList {
 }
 
 class CharacterData {
-  late final String imgPath; //to be updated when necessary
+  final String imgPath; //to be updated when necessary
 
-  CharacterData({required imgPath});
+  CharacterData({required this.imgPath});
 }
 
 class CharacterList {
-  static final List<CharacterData> _characters = [];
+  static const List<CharacterData> _characters = [];
   CharacterList._();
 
   List<CharacterData> getCharacters() {
