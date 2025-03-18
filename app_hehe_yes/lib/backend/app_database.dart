@@ -23,6 +23,7 @@ class Users extends Table {
       boolean().withDefault(const Constant(false))(); // Darkmode setting
   RealColumn get budget => real()
       .withDefault(const Constant(0.0))(); // Budget (decimal with precision)
+  IntColumn get hiddenValue => integer()();
 }
 
 @DataClassName('TransactionHistory')
@@ -97,13 +98,16 @@ class AppDatabase extends _$AppDatabase {
   @override
   int get schemaVersion => 1;
 
-  Future<int> insertUser(UserData user) async {
-    return await into(users).insert(user.toCompanion(true));
+  Future<int> insertUser(UsersCompanion user) async {
+    return await into(users).insert(user);
   }
 
-  Future<List<UserAchievement>> getAchievementsOfUser(int userId) async {
-    return await (select(achievements)..where((a) => a.userID.equals(userId)))
+  Future<List<AchievementData>> getAchievementsOfUser(int userId) async {
+    var achData = await (select(achievements)
+          ..where((a) => a.userID.equals(userId)))
+        .map((a) => a.achievementIndex)
         .get();
+    return AchievementList.getAchievementsAt(achData);
   }
 
   Future<List<UserData>> getFriendsOfUser(int userId) async {
@@ -134,9 +138,8 @@ class AppDatabase extends _$AppDatabase {
         .get();
   }
 
-  Future<int> inserTransaction(TransactionHistory userTransaction) async {
-    final retVal =
-        await into(transactions).insert(userTransaction.toCompanion(true));
+  Future<int> inserTransaction(TransactionsCompanion userTransaction) async {
+    final retVal = await into(transactions).insert(userTransaction);
 
     return retVal;
   }
@@ -171,15 +174,12 @@ class AppDatabase extends _$AppDatabase {
     return loginStreak;
   }
 
-  Future<UserData?> loginUser(String userName) async {
+  Future<UserData> loginUser(String userName, int uid) async {
     return await transaction(() async {
       final user = await (select(users)
-            ..where((u) => u.username.equals(userName)))
-          .getSingleOrNull();
-
-      if (user == null) {
-        return user;
-      }
+            ..where(
+                (u) => u.username.equals(userName) & u.hiddenValue.equals(uid)))
+          .getSingle();
 
       await into(logins).insert(LoginsCompanion(userID: Value(user.userID)));
 
@@ -236,5 +236,10 @@ class AppDatabase extends _$AppDatabase {
     }
 
     return updateUserData(user.userID, level: userLvl, xp: userXp);
+  }
+
+  Future<UserData> getUser(int userId) async {
+    return await (select(users)..where((u) => u.userID.equals(userId)))
+        .getSingle();
   }
 }

@@ -1,7 +1,8 @@
+import 'package:app_hehe_yes/backend/static_data.dart';
 import 'package:flutter/material.dart';
 
 class ExpenseScreen extends StatefulWidget {
-  final Function(double, bool, String) onSubmit;
+  final Function(double, bool, int) onSubmit;
 
   const ExpenseScreen({super.key, required this.onSubmit});
 
@@ -11,36 +12,41 @@ class ExpenseScreen extends StatefulWidget {
 
 class _ExpenseScreenState extends State<ExpenseScreen> {
   final TextEditingController amountController = TextEditingController();
-  final List<String> categories = ["Food", "Rent", "Bills", "Gaming", "Transport", "Shopping", "Subscriptions", "Health", "Education", "Entertainment"];
-  String selectedCategory = "Food";
+  int selectedCategoryIdx = 0;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Add Expense"), backgroundColor: const Color.fromARGB(255, 235, 103, 52)),
+      appBar: AppBar(
+          title: const Text("Add Expense"),
+          backgroundColor: const Color.fromARGB(255, 235, 103, 52)),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
             const Text("Enter Amount:"),
-            TextField(controller: amountController, keyboardType: TextInputType.number),
+            TextField(
+                controller: amountController,
+                keyboardType: TextInputType.number),
             const SizedBox(height: 10),
             const Text("Select Category:"),
-            DropdownButton<String>(
-              value: selectedCategory,
-              onChanged: (String? newValue) {
+            DropdownButton<int>(
+              value: selectedCategoryIdx,
+              onChanged: (int? newValue) {
                 setState(() {
-                  selectedCategory = newValue!;
+                  selectedCategoryIdx = newValue!;
                 });
               },
-              items: categories.map((String category) {
-                return DropdownMenuItem<String>(value: category, child: Text(category));
+              items:
+                  CategoryList.getCategories().asMap().entries.map((category) {
+                return DropdownMenuItem<int>(
+                    value: category.key, child: Text(category.value));
               }).toList(),
             ),
             ElevatedButton(
               onPressed: () {
                 double amount = double.tryParse(amountController.text) ?? 0;
-                widget.onSubmit(amount, false, selectedCategory);
+                widget.onSubmit(amount, false, selectedCategoryIdx);
                 Navigator.pop(context);
               },
               child: const Text("Save Expense"),

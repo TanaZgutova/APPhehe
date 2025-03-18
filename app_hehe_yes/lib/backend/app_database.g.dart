@@ -73,6 +73,12 @@ class $UsersTable extends Users with TableInfo<$UsersTable, UserData> {
       type: DriftSqlType.double,
       requiredDuringInsert: false,
       defaultValue: const Constant(0.0));
+  static const VerificationMeta _hiddenValueMeta =
+      const VerificationMeta('hiddenValue');
+  @override
+  late final GeneratedColumn<int> hiddenValue = GeneratedColumn<int>(
+      'hidden_value', aliasedName, false,
+      type: DriftSqlType.int, requiredDuringInsert: true);
   @override
   List<GeneratedColumn> get $columns => [
         userID,
@@ -82,7 +88,8 @@ class $UsersTable extends Users with TableInfo<$UsersTable, UserData> {
         xp,
         currencyIndex,
         darkmode,
-        budget
+        budget,
+        hiddenValue
       ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -131,6 +138,14 @@ class $UsersTable extends Users with TableInfo<$UsersTable, UserData> {
       context.handle(_budgetMeta,
           budget.isAcceptableOrUnknown(data['budget']!, _budgetMeta));
     }
+    if (data.containsKey('hidden_value')) {
+      context.handle(
+          _hiddenValueMeta,
+          hiddenValue.isAcceptableOrUnknown(
+              data['hidden_value']!, _hiddenValueMeta));
+    } else if (isInserting) {
+      context.missing(_hiddenValueMeta);
+    }
     return context;
   }
 
@@ -156,6 +171,8 @@ class $UsersTable extends Users with TableInfo<$UsersTable, UserData> {
           .read(DriftSqlType.bool, data['${effectivePrefix}darkmode'])!,
       budget: attachedDatabase.typeMapping
           .read(DriftSqlType.double, data['${effectivePrefix}budget'])!,
+      hiddenValue: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}hidden_value'])!,
     );
   }
 
@@ -174,6 +191,7 @@ class UserData extends DataClass implements Insertable<UserData> {
   final int currencyIndex;
   final bool darkmode;
   final double budget;
+  final int hiddenValue;
   const UserData(
       {required this.userID,
       required this.username,
@@ -182,7 +200,8 @@ class UserData extends DataClass implements Insertable<UserData> {
       required this.xp,
       required this.currencyIndex,
       required this.darkmode,
-      required this.budget});
+      required this.budget,
+      required this.hiddenValue});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
@@ -194,6 +213,7 @@ class UserData extends DataClass implements Insertable<UserData> {
     map['currency_index'] = Variable<int>(currencyIndex);
     map['darkmode'] = Variable<bool>(darkmode);
     map['budget'] = Variable<double>(budget);
+    map['hidden_value'] = Variable<int>(hiddenValue);
     return map;
   }
 
@@ -207,6 +227,7 @@ class UserData extends DataClass implements Insertable<UserData> {
       currencyIndex: Value(currencyIndex),
       darkmode: Value(darkmode),
       budget: Value(budget),
+      hiddenValue: Value(hiddenValue),
     );
   }
 
@@ -222,6 +243,7 @@ class UserData extends DataClass implements Insertable<UserData> {
       currencyIndex: serializer.fromJson<int>(json['currencyIndex']),
       darkmode: serializer.fromJson<bool>(json['darkmode']),
       budget: serializer.fromJson<double>(json['budget']),
+      hiddenValue: serializer.fromJson<int>(json['hiddenValue']),
     );
   }
   @override
@@ -236,6 +258,7 @@ class UserData extends DataClass implements Insertable<UserData> {
       'currencyIndex': serializer.toJson<int>(currencyIndex),
       'darkmode': serializer.toJson<bool>(darkmode),
       'budget': serializer.toJson<double>(budget),
+      'hiddenValue': serializer.toJson<int>(hiddenValue),
     };
   }
 
@@ -247,7 +270,8 @@ class UserData extends DataClass implements Insertable<UserData> {
           int? xp,
           int? currencyIndex,
           bool? darkmode,
-          double? budget}) =>
+          double? budget,
+          int? hiddenValue}) =>
       UserData(
         userID: userID ?? this.userID,
         username: username ?? this.username,
@@ -257,6 +281,7 @@ class UserData extends DataClass implements Insertable<UserData> {
         currencyIndex: currencyIndex ?? this.currencyIndex,
         darkmode: darkmode ?? this.darkmode,
         budget: budget ?? this.budget,
+        hiddenValue: hiddenValue ?? this.hiddenValue,
       );
   UserData copyWithCompanion(UsersCompanion data) {
     return UserData(
@@ -272,6 +297,8 @@ class UserData extends DataClass implements Insertable<UserData> {
           : this.currencyIndex,
       darkmode: data.darkmode.present ? data.darkmode.value : this.darkmode,
       budget: data.budget.present ? data.budget.value : this.budget,
+      hiddenValue:
+          data.hiddenValue.present ? data.hiddenValue.value : this.hiddenValue,
     );
   }
 
@@ -285,14 +312,15 @@ class UserData extends DataClass implements Insertable<UserData> {
           ..write('xp: $xp, ')
           ..write('currencyIndex: $currencyIndex, ')
           ..write('darkmode: $darkmode, ')
-          ..write('budget: $budget')
+          ..write('budget: $budget, ')
+          ..write('hiddenValue: $hiddenValue')
           ..write(')'))
         .toString();
   }
 
   @override
   int get hashCode => Object.hash(userID, username, characterIndex, level, xp,
-      currencyIndex, darkmode, budget);
+      currencyIndex, darkmode, budget, hiddenValue);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -304,7 +332,8 @@ class UserData extends DataClass implements Insertable<UserData> {
           other.xp == this.xp &&
           other.currencyIndex == this.currencyIndex &&
           other.darkmode == this.darkmode &&
-          other.budget == this.budget);
+          other.budget == this.budget &&
+          other.hiddenValue == this.hiddenValue);
 }
 
 class UsersCompanion extends UpdateCompanion<UserData> {
@@ -316,6 +345,7 @@ class UsersCompanion extends UpdateCompanion<UserData> {
   final Value<int> currencyIndex;
   final Value<bool> darkmode;
   final Value<double> budget;
+  final Value<int> hiddenValue;
   const UsersCompanion({
     this.userID = const Value.absent(),
     this.username = const Value.absent(),
@@ -325,6 +355,7 @@ class UsersCompanion extends UpdateCompanion<UserData> {
     this.currencyIndex = const Value.absent(),
     this.darkmode = const Value.absent(),
     this.budget = const Value.absent(),
+    this.hiddenValue = const Value.absent(),
   });
   UsersCompanion.insert({
     this.userID = const Value.absent(),
@@ -335,7 +366,9 @@ class UsersCompanion extends UpdateCompanion<UserData> {
     this.currencyIndex = const Value.absent(),
     this.darkmode = const Value.absent(),
     this.budget = const Value.absent(),
-  }) : username = Value(username);
+    required int hiddenValue,
+  })  : username = Value(username),
+        hiddenValue = Value(hiddenValue);
   static Insertable<UserData> custom({
     Expression<int>? userID,
     Expression<String>? username,
@@ -345,6 +378,7 @@ class UsersCompanion extends UpdateCompanion<UserData> {
     Expression<int>? currencyIndex,
     Expression<bool>? darkmode,
     Expression<double>? budget,
+    Expression<int>? hiddenValue,
   }) {
     return RawValuesInsertable({
       if (userID != null) 'user_i_d': userID,
@@ -355,6 +389,7 @@ class UsersCompanion extends UpdateCompanion<UserData> {
       if (currencyIndex != null) 'currency_index': currencyIndex,
       if (darkmode != null) 'darkmode': darkmode,
       if (budget != null) 'budget': budget,
+      if (hiddenValue != null) 'hidden_value': hiddenValue,
     });
   }
 
@@ -366,7 +401,8 @@ class UsersCompanion extends UpdateCompanion<UserData> {
       Value<int>? xp,
       Value<int>? currencyIndex,
       Value<bool>? darkmode,
-      Value<double>? budget}) {
+      Value<double>? budget,
+      Value<int>? hiddenValue}) {
     return UsersCompanion(
       userID: userID ?? this.userID,
       username: username ?? this.username,
@@ -376,6 +412,7 @@ class UsersCompanion extends UpdateCompanion<UserData> {
       currencyIndex: currencyIndex ?? this.currencyIndex,
       darkmode: darkmode ?? this.darkmode,
       budget: budget ?? this.budget,
+      hiddenValue: hiddenValue ?? this.hiddenValue,
     );
   }
 
@@ -406,6 +443,9 @@ class UsersCompanion extends UpdateCompanion<UserData> {
     if (budget.present) {
       map['budget'] = Variable<double>(budget.value);
     }
+    if (hiddenValue.present) {
+      map['hidden_value'] = Variable<int>(hiddenValue.value);
+    }
     return map;
   }
 
@@ -419,7 +459,8 @@ class UsersCompanion extends UpdateCompanion<UserData> {
           ..write('xp: $xp, ')
           ..write('currencyIndex: $currencyIndex, ')
           ..write('darkmode: $darkmode, ')
-          ..write('budget: $budget')
+          ..write('budget: $budget, ')
+          ..write('hiddenValue: $hiddenValue')
           ..write(')'))
         .toString();
   }
@@ -1441,6 +1482,7 @@ typedef $$UsersTableCreateCompanionBuilder = UsersCompanion Function({
   Value<int> currencyIndex,
   Value<bool> darkmode,
   Value<double> budget,
+  required int hiddenValue,
 });
 typedef $$UsersTableUpdateCompanionBuilder = UsersCompanion Function({
   Value<int> userID,
@@ -1451,6 +1493,7 @@ typedef $$UsersTableUpdateCompanionBuilder = UsersCompanion Function({
   Value<int> currencyIndex,
   Value<bool> darkmode,
   Value<double> budget,
+  Value<int> hiddenValue,
 });
 
 final class $$UsersTableReferences
@@ -1568,6 +1611,9 @@ class $$UsersTableFilterComposer extends Composer<_$AppDatabase, $UsersTable> {
 
   ColumnFilters<double> get budget => $composableBuilder(
       column: $table.budget, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get hiddenValue => $composableBuilder(
+      column: $table.hiddenValue, builder: (column) => ColumnFilters(column));
 
   Expression<bool> transactionsRefs(
       Expression<bool> Function($$TransactionsTableFilterComposer f) f) {
@@ -1709,6 +1755,9 @@ class $$UsersTableOrderingComposer
 
   ColumnOrderings<double> get budget => $composableBuilder(
       column: $table.budget, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get hiddenValue => $composableBuilder(
+      column: $table.hiddenValue, builder: (column) => ColumnOrderings(column));
 }
 
 class $$UsersTableAnnotationComposer
@@ -1743,6 +1792,9 @@ class $$UsersTableAnnotationComposer
 
   GeneratedColumn<double> get budget =>
       $composableBuilder(column: $table.budget, builder: (column) => column);
+
+  GeneratedColumn<int> get hiddenValue => $composableBuilder(
+      column: $table.hiddenValue, builder: (column) => column);
 
   Expression<T> transactionsRefs<T extends Object>(
       Expression<T> Function($$TransactionsTableAnnotationComposer a) f) {
@@ -1886,6 +1938,7 @@ class $$UsersTableTableManager extends RootTableManager<
             Value<int> currencyIndex = const Value.absent(),
             Value<bool> darkmode = const Value.absent(),
             Value<double> budget = const Value.absent(),
+            Value<int> hiddenValue = const Value.absent(),
           }) =>
               UsersCompanion(
             userID: userID,
@@ -1896,6 +1949,7 @@ class $$UsersTableTableManager extends RootTableManager<
             currencyIndex: currencyIndex,
             darkmode: darkmode,
             budget: budget,
+            hiddenValue: hiddenValue,
           ),
           createCompanionCallback: ({
             Value<int> userID = const Value.absent(),
@@ -1906,6 +1960,7 @@ class $$UsersTableTableManager extends RootTableManager<
             Value<int> currencyIndex = const Value.absent(),
             Value<bool> darkmode = const Value.absent(),
             Value<double> budget = const Value.absent(),
+            required int hiddenValue,
           }) =>
               UsersCompanion.insert(
             userID: userID,
@@ -1916,6 +1971,7 @@ class $$UsersTableTableManager extends RootTableManager<
             currencyIndex: currencyIndex,
             darkmode: darkmode,
             budget: budget,
+            hiddenValue: hiddenValue,
           ),
           withReferenceMapper: (p0) => p0
               .map((e) =>

@@ -17,13 +17,15 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Subscriptions"), backgroundColor: Colors.purple),
+      appBar: AppBar(
+          title: const Text("Subscriptions"), backgroundColor: Colors.purple),
       body: ListView.builder(
         itemCount: subscriptions.length,
         itemBuilder: (context, index) {
           return ListTile(
             title: Text(subscriptions[index]["name"]!),
-            subtitle: Text("Amount: \$${subscriptions[index]["amount"]} - Due: ${subscriptions[index]["date"]}"),
+            subtitle: Text(
+                "Amount: \$${subscriptions[index]["amount"]} - Due: ${subscriptions[index]["date"]}"),
             trailing: IconButton(
               icon: const Icon(Icons.delete, color: Colors.red),
               onPressed: () {

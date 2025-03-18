@@ -8,7 +8,7 @@ set(BINARY_NAME "app_hehe_yes")
 # The unique GTK application identifier for this application. See:
 # https://wiki.gnome.org/HowDoI/ChooseApplicationID
 set(APPLICATION_ID "com.example.app_hehe_yes")
-
+add_definitions(-DAPPLICATION_ID="com.example.app_hehe_yes")
 # Explicitly opt in to modern CMake behaviors to avoid warnings with recent
 # versions of CMake.
 cmake_policy(SET CMP0063 NEW)

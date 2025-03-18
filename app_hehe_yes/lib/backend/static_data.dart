@@ -3,7 +3,7 @@ class AchievementData {
   final String description;
   final double thresholdValue;
 
-  AchievementData({
+  const AchievementData({
     required this.name,
     required this.description,
     required this.thresholdValue,
@@ -50,27 +50,37 @@ class AchievementList {
   static List<int> checkSavingsAchievements(bool Function(double) predicate) {
     return _checkAchievements(_savingAhcivements, predicate);
   }
+
+  static List<AchievementData> getAchievementsAt(List<int> achievementIndexes) {
+    return List.unmodifiable(
+        achievementIndexes.map((idx) => _achievements[idx]));
+  }
 }
 
 class CurrencyData {
   final String name;
   final String displayName;
 
-  CurrencyData({
+  const CurrencyData({
     required this.name,
     required this.displayName,
   });
 }
 
 class CurrencyList {
-  static const List<CurrencyData> _currencies = [];
+  static const List<CurrencyData> _currencies = [
+    CurrencyData(displayName: "USD", name: "dollars"),
+    CurrencyData(displayName: "PLZ", name: "zloty"),
+    CurrencyData(displayName: "EUR", name: "euro"),
+    CurrencyData(displayName: "GBP", name: "ponds")
+  ];
   CurrencyList._();
 
-  List<CurrencyData> getCurrencies() {
+  static List<CurrencyData> getCurrencies() {
     return _currencies;
   }
 
-  CurrencyData getCurrencyAt(int index) {
+  static CurrencyData getCurrencyAt(int index) {
     return _currencies[index];
   }
 }
@@ -78,18 +88,42 @@ class CurrencyList {
 class CharacterData {
   final String imgPath; //to be updated when necessary
 
-  CharacterData({required this.imgPath});
+  const CharacterData({required this.imgPath});
 }
 
 class CharacterList {
   static const List<CharacterData> _characters = [];
   CharacterList._();
 
-  List<CharacterData> getCharacters() {
+  static List<CharacterData> getCharacters() {
     return _characters;
   }
 
-  CharacterData getCharacterAt(int index) {
+  static CharacterData getCharacterAt(int index) {
     return _characters[index];
+  }
+}
+
+class CategoryList {
+  static const List<String> _categories = [
+    "Food",
+    "Rent",
+    "Bills",
+    "Gaming",
+    "Transport",
+    "Shopping",
+    "Subscriptions",
+    "Health",
+    "Education",
+    "Entertainment"
+  ];
+  CategoryList._();
+
+  static List<String> getCategories() {
+    return _categories;
+  }
+
+  static String getCategoryAt(int index) {
+    return _categories[index];
   }
 }
