@@ -1,10 +1,10 @@
 import 'package:app_hehe_yes/backend/app_database.dart';
 import 'package:app_hehe_yes/backend/static_data.dart';
+import 'package:app_hehe_yes/challenges_screen.dart';
 import 'backend/secure_storage.dart';
 import 'package:flutter/material.dart';
 import 'stats_screen.dart';
 import 'history_screen.dart';
-import 'goals_screen.dart';
 import 'profile_screen.dart';
 import 'income_screen.dart';
 import 'expense_screen.dart';
@@ -59,7 +59,6 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   UserData? _userData;
-  List<AchievementData> _achievements = [];
   Map<String, double> budgets = {
     "Food": 200,
     "Transport": 100,
@@ -67,6 +66,7 @@ class _HomeScreenState extends State<HomeScreen> {
   };
   Map<String, double> spending = {};
   List<TransactionHistory> _transactionHistory = [];
+  List<int> _achievements = [];
   final db = AppDatabase();
   bool _finished = false;
 
@@ -75,21 +75,13 @@ class _HomeScreenState extends State<HomeScreen> {
       amount: amount,
       userID: _userData!.userID,
       categoryIndex: categoryIdx,
-      withdraw: isIncome,
+      withdraw: !isIncome,
     ));
-    var transactionHistory = await db.getTransactionsForUser(_userData!.userID);
-    var achievements = await db.getAchievementsOfUser(_userData!.userID);
+  }
 
-    setState(() {
-      _transactionHistory = transactionHistory;
-      _achievements = achievements;
-    });
-
-    // if (!isIncome) {
-    //   spending[category] = (spending[category] ?? 0) + amount;
-    //   if (spending[category]! > budgets[category]!) {
-    //     achievements.add("Overspent in $category!");
-    //   }
+  double _calculateMoney() {
+    return _transactionHistory.fold(
+        0.0, (sum, e) => sum + (e.withdraw ? e.amount : -e.amount));
   }
 
   Future<SecureData?> _getUserName() async {
@@ -104,18 +96,20 @@ class _HomeScreenState extends State<HomeScreen> {
     // await SecureStorageService.clearSecureData();
     var user = await _getUserName();
     if (user == null) {
-      var uid = await _setUserName("MORE");
+      //toto tu nebude ....
+      final uid = await _setUserName("MORE");
       await db.insertUser(
           UsersCompanion.insert(username: "MORE", hiddenValue: uid));
       user = SecureData(userName: "MORE", id: uid);
     }
-    var userData = await db.loginUser(user.userName, user.id);
+    final userData = await db.loginUser(user.userName, user.id);
 
     if (userData.darkmode != widget.isDarkMode) {
       widget.toggleDarkMode();
     }
-    var transactionHistory = await db.getTransactionsForUser(userData.userID);
-    var achievements = await db.getAchievementsOfUser(userData.userID);
+
+    final transactionHistory = await db.getTransactionsForUser(userData.userID);
+    final achievements = await db.getAchievementsOfUser(userData.userID);
 
     setState(() {
       _userData = userData;
@@ -163,7 +157,6 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ),
               ).then((_) async {
-                final db = AppDatabase();
                 final userData = await db.getUser(_userData!.userID);
                 setState(() {
                   _userData = userData;
@@ -177,9 +170,9 @@ class _HomeScreenState extends State<HomeScreen> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Text(
-              'Total Balance: ${_userData!.budget.toStringAsFixed(2)} ${CurrencyList.getCurrencyAt(_userData!.currencyIndex).displayName}',
+              'Total Balance: ${_calculateMoney()} ${CurrencyList.getCurrencyAt(_userData!.currencyIndex).displayName}',
               style: Theme.of(context).textTheme.headlineMedium),
-          Text('Level: ${_userData!.level} | XP: ${_userData!.xp}/100',
+          Text('Level: ${_userData!.level}',
               style: const TextStyle(
                   fontSize: 18, color: Color.fromARGB(255, 133, 142, 146))),
           const SizedBox(height: 50),
@@ -195,8 +188,8 @@ class _HomeScreenState extends State<HomeScreen> {
                           IncomeScreen(onSubmit: _addTransaction),
                     ),
                   ).then((_) async {
-                    final db = AppDatabase();
-                    final transactions = await db.getTransactionsForUser(_userData!.userID);
+                    final transactions =
+                        await db.getTransactionsForUser(_userData!.userID);
                     setState(() {
                       _transactionHistory = transactions;
                     });
@@ -214,8 +207,8 @@ class _HomeScreenState extends State<HomeScreen> {
                           ExpenseScreen(onSubmit: _addTransaction),
                     ),
                   ).then((_) async {
-                    final db = AppDatabase();
-                    final transactions = await db.getTransactionsForUser(_userData!.userID);
+                    final transactions =
+                        await db.getTransactionsForUser(_userData!.userID);
                     setState(() {
                       _transactionHistory = transactions;
                     });
@@ -238,15 +231,22 @@ class _HomeScreenState extends State<HomeScreen> {
           BottomNavigationBarItem(
               icon: Icon(Icons.person, color: Colors.grey), label: "Profile"),
         ],
-        onTap: (index) {
+        onTap: (index) async {
           List<Widget> screens = [
             StatsScreen(transactionHistory: _transactionHistory),
             HistoryScreen(transactionHistory: _transactionHistory),
-            GoalsScreen(),
+            ChallengesScreen(user: _userData!,achivements: _achievements),
             ProfileScreen(userData: _userData!, achievements: _achievements),
           ];
           Navigator.push(
-              context, MaterialPageRoute(builder: (context) => screens[index]));
+              context, MaterialPageRoute(builder: (context) => screens[index])).then((_) async {
+                final user = await db.getUser(_userData!.userID);
+                final achievements = await db.getAchievementsOfUser(_userData!.userID);
+                setState(() {
+                  _userData = user;
+                  _achievements = achievements;
+                });
+              });
         },
       ),
     );

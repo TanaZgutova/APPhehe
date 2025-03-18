@@ -2,7 +2,6 @@ import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
-import 'static_data.dart';
 import 'dart:io';
 part 'app_database.g.dart';
 
@@ -14,9 +13,7 @@ class Users extends Table {
       text().withLength(min: 1, max: 255)(); // Username field
   IntColumn get characterIndex => integer().withDefault(const Constant(0))();
   IntColumn get level =>
-      integer().withDefault(const Constant(0))(); // Level of the user
-  IntColumn get xp =>
-      integer().withDefault(const Constant(0))(); // Experience points
+      integer().withDefault(const Constant(1))(); // Level of the user
   IntColumn get currencyIndex =>
       integer().withDefault(const Constant(0))(); // Currency Index
   BoolColumn get darkmode =>
@@ -69,17 +66,7 @@ class Friendships extends Table {
       {userID, friendID}; // Composite primary key (userID + friendID)
 }
 
-@DataClassName('UserLogIn')
-class Logins extends Table {
-  IntColumn get userID => integer().references(Users, #userID,
-      onUpdate: KeyAction.noAction, onDelete: KeyAction.cascade)();
-  DateTimeColumn get date => dateTime().withDefault(currentDateAndTime)();
-
-  @override
-  Set<Column> get primaryKey => {userID, date};
-}
-
-@DriftDatabase(tables: [Users, Transactions, Achievements, Friendships, Logins])
+@DriftDatabase(tables: [Users, Transactions, Achievements, Friendships])
 class AppDatabase extends _$AppDatabase {
   static final _instance = AppDatabase._internal();
 
@@ -102,12 +89,15 @@ class AppDatabase extends _$AppDatabase {
     return await into(users).insert(user);
   }
 
-  Future<List<AchievementData>> getAchievementsOfUser(int userId) async {
-    var achData = await (select(achievements)
-          ..where((a) => a.userID.equals(userId)))
+  Future<List<int>> getAchievementsOfUser(int userId) async {
+    return await (select(achievements)
+          ..where((a) => a.userID.equals(userId))
+          ..orderBy([
+            (a) => OrderingTerm(
+                expression: a.achievementIndex, mode: OrderingMode.asc)
+          ]))
         .map((a) => a.achievementIndex)
         .get();
-    return AchievementList.getAchievementsAt(achData);
   }
 
   Future<List<UserData>> getFriendsOfUser(int userId) async {
@@ -144,98 +134,42 @@ class AppDatabase extends _$AppDatabase {
     return retVal;
   }
 
-  Future<int> insertAchievement(UserAchievement userAchivement) async {
-    return await into(achievements).insert(userAchivement.toCompanion(true));
-  }
+  Future<void> insertAchievement(
+      AchievementsCompanion userAchivement, int userId) async {
+    await transaction(
+      () async {
+        await into(achievements).insert(userAchivement, mode: InsertMode.insertOrIgnore);
+        final userData = await getUser(userId);
+        if (userData.level == 5) {
+          return;
+        }
 
-  Future<int> getUserLoginStreak(int userId) async {
-    final userLogins = await (select(logins)
-          ..where((l) => l.userID.equals(userId))
-          ..orderBy([
-            (l) => OrderingTerm(expression: l.date, mode: OrderingMode.desc)
-          ]))
-        .get();
+        final completedAchievements = await getAchievementsOfUser(userId);
 
-    if (userLogins.isEmpty) {
-      return 0;
-    }
-
-    var loginStreak = 1;
-    final lastUserLogin = userLogins.first.date;
-
-    for (var i = 1; i < userLogins.length; i++) {
-      if (lastUserLogin.difference(userLogins[i].date).inDays > 1) {
-        break;
-      }
-
-      loginStreak++;
-    }
-
-    return loginStreak;
+        if (completedAchievements.length == 5 * userData.level) {
+          await updateUserData(userData.userID, level: userData.level + 1);
+        }
+      },
+    );
   }
 
   Future<UserData> loginUser(String userName, int uid) async {
-    return await transaction(() async {
-      final user = await (select(users)
-            ..where(
-                (u) => u.username.equals(userName) & u.hiddenValue.equals(uid)))
-          .getSingle();
-
-      await into(logins).insert(LoginsCompanion(userID: Value(user.userID)));
-
-      final lastUserLoginDate = await (select(logins)
-            ..where((l) => l.userID.equals(user.userID))
-            ..orderBy([
-              (l) => OrderingTerm(expression: l.date, mode: OrderingMode.desc)
-            ])
-            ..limit(1))
-          .getSingleOrNull();
-
-      if (lastUserLoginDate == null ||
-          lastUserLoginDate.date.day != DateTime.now().day) {
-        into(logins).insert(LoginsCompanion(userID: Value(user.userID)));
-
-        final userLoginStreak = await getUserLoginStreak(user.userID);
-        final newAchivements = AchievementList.checkStreakAchievements(
-            (val) => userLoginStreak > val);
-        final achData = newAchivements.map((data) => AchievementsCompanion(
-            achievementIndex: Value(data), userID: Value(user.userID)));
-        await batch((batch) {
-          batch.insertAll(achievements, achData,
-              mode: InsertMode.insertOrIgnore);
-        });
-      }
-      return user;
-    });
+    return await (select(users)
+          ..where(
+              (u) => u.username.equals(userName) & u.hiddenValue.equals(uid)))
+        .getSingle();
   }
 
   Future<int> updateUserData(int userId,
-      {int? level,
-      int? xp,
-      int? currencyIndex,
-      bool? darkmode,
-      double? budget}) async {
+      {int? level, int? currencyIndex, bool? darkmode, double? budget}) async {
     final query = update(users)..where((u) => u.userID.equals(userId));
 
     return await query.write(UsersCompanion(
       level: Value.absentIfNull(level),
-      xp: Value.absentIfNull(xp),
       currencyIndex: Value.absentIfNull(currencyIndex),
       darkmode: Value.absentIfNull(darkmode),
       budget: Value.absentIfNull(budget),
     ));
-  }
-
-  Future<int> addUserXp(UserData user, int xp) async {
-    var userXp = user.xp + xp;
-    var userLvl = user.level;
-
-    if (userXp >= 100) {
-      userXp -= 100;
-      userLvl++;
-    }
-
-    return updateUserData(user.userID, level: userLvl, xp: userXp);
   }
 
   Future<UserData> getUser(int userId) async {

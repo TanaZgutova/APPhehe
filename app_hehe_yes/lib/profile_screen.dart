@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 
 class ProfileScreen extends StatelessWidget {
   final UserData userData;
-  final List<AchievementData> achievements;
+  final List<int> achievements;
 
   const ProfileScreen(
       {super.key, required this.userData, required this.achievements});
@@ -23,13 +23,21 @@ class ProfileScreen extends StatelessWidget {
             const SizedBox(height: 10),
             Text("Level: ${userData.level}",
                 style: const TextStyle(fontSize: 20)),
-            Text("XP: ${userData.xp}/100",
-                style: const TextStyle(fontSize: 18)),
             const SizedBox(height: 20),
             const Text("Achievements",
                 style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
-            ...achievements
-                .map((achievement) => Text("🏆 ${achievement.name}")),
+            Expanded(
+              child: achievements.isEmpty
+                  ? Text("no Achievements yet!")
+                  : ListView.builder(
+                      itemCount: achievements.length,
+                      itemBuilder: (context, index) {
+                        final achievement =
+                            AchievementList.getAchievementAt(index);
+                        return Text(
+                            "${achievement.name}: ${achievement.description}");
+                      }),
+            )
           ],
         ),
       ),

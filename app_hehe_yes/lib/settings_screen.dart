@@ -7,23 +7,21 @@ class SettingsScreen extends StatefulWidget {
   final UserData user;
 
   const SettingsScreen(
-      {super.key,
-      required this.toggleDarkMode,
-      required this.user});
+      {super.key, required this.toggleDarkMode, required this.user});
 
-    @override
+  @override
   _SettingsScreenState createState() => _SettingsScreenState();
 }
+
 class _SettingsScreenState extends State<SettingsScreen> {
   late UserData _user;
-
 
   Future<void> _loadUserData() async {
     final db = AppDatabase();
     final userData = await db.getUser(widget.user.userID);
 
     setState(() {
-       _user = userData;
+      _user = userData;
     });
   }
 
@@ -48,7 +46,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
             title: const Text("Dark Mode"),
             value: Theme.of(context).brightness == Brightness.dark,
             onChanged: (value) async {
-
               widget.toggleDarkMode();
               final db = AppDatabase();
 
@@ -57,7 +54,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
               setState(() {
                 _user = userData;
               });
-
             },
           ),
           const Divider(),
@@ -65,15 +61,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
               style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
           DropdownButton<int>(
             value: _user.currencyIndex,
-
             onChanged: (int? newValue) async {
               final db = AppDatabase();
-              await db.updateUserData(_user.userID,currencyIndex: newValue!);
+              await db.updateUserData(_user.userID, currencyIndex: newValue!);
               final userData = await db.getUser(_user.userID);
               setState(() {
                 _user = userData;
               });
-              
             },
             items: CurrencyList.getCurrencies()
                 .asMap()
