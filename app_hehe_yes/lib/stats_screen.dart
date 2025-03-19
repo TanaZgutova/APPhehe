@@ -1,4 +1,5 @@
 import 'package:app_hehe_yes/backend/app_database.dart';
+import 'package:app_hehe_yes/backend/static_data.dart';
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 
@@ -10,12 +11,13 @@ class StatsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Map<int, double> categoryTotals = {};
+    Map<String, double> categoryTotals = {};
 
     for (var transaction in transactionHistory) {
       if (transaction.withdraw) {
-        categoryTotals[transaction.categoryIndex] =
-            (categoryTotals[transaction.categoryIndex] ?? 0) +
+        final cat = CategoryList.getCategoryAt(transaction.categoryIndex);
+        categoryTotals[cat] =
+            (categoryTotals[cat] ?? 0) +
                 transaction.amount;
       }
     }

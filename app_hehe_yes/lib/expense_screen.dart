@@ -38,7 +38,7 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
                 });
               },
               items:
-                  CategoryList.getCategories().asMap().entries.map((category) {
+                  CategoryList.getExpenseCategories().asMap().entries.map((category) {
                 return DropdownMenuItem<int>(
                     value: category.key, child: Text(category.value));
               }).toList(),

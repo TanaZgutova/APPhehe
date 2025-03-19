@@ -5,7 +5,8 @@ import 'package:flutter/material.dart';
 class ChallengesScreen extends StatelessWidget {
   final UserData user;
   final List<int> achivements;
-  const ChallengesScreen({super.key, required this.user, required this.achivements});
+  const ChallengesScreen(
+      {super.key, required this.user, required this.achivements});
 
   void _completeChallenge(int index) async {
     final db = AppDatabase();
@@ -30,7 +31,7 @@ class ChallengesScreen extends StatelessWidget {
             child: ListView.builder(
               itemCount: 5,
               itemBuilder: (context, index) {
-                final achIdx = 5 * (user.level-1) + index;
+                final achIdx = 5 * (user.level - 1) + index;
                 return ChallengeTile(
                   index: achIdx,
                   completeChallenge: _completeChallenge,
@@ -52,11 +53,13 @@ class ChallengeTile extends StatefulWidget {
   final AchievementData data;
   final bool complete;
 
-  const ChallengeTile(
-      {super.key,
-      required this.index,
-      required this.completeChallenge,
-      required this.data,this.complete=false,});
+  const ChallengeTile({
+    super.key,
+    required this.index,
+    required this.completeChallenge,
+    required this.data,
+    this.complete = false,
+  });
   @override
   ChallengeTileState createState() => ChallengeTileState();
 }
@@ -71,7 +74,6 @@ class ChallengeTileState extends State<ChallengeTile> {
       title: Text(widget.data.name),
       trailing: ElevatedButton(
         onPressed: () {
-
           if (isFinished) {
             return;
           }
@@ -81,7 +83,6 @@ class ChallengeTileState extends State<ChallengeTile> {
           setState(() {
             isFinished = true;
           });
-
         },
         child: Text(isFinished ? "Complete" : "notComplete"),
       ),

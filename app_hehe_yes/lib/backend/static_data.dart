@@ -1,3 +1,7 @@
+import 'dart:math';
+
+import 'package:flutter/foundation.dart';
+
 class AchievementData {
   final String name;
   final String description;
@@ -176,6 +180,12 @@ class CharacterList {
   }
 }
 
+class CategoryData {
+  final String name;
+  final int index;
+
+  const CategoryData({required this.name, required this.index});
+}
 class CategoryList {
   static const List<String> _categories = [
     "Food",
@@ -187,14 +197,30 @@ class CategoryList {
     "Subscriptions",
     "Health",
     "Education",
-    "Entertainment"
+    "Entertainment",
+    "Salary",
+    "Freelance",
+    "Investments",
+    "Gifts",
+    "Bonuses",
+    "Side Hustles",
+    "Other"
   ];
+
   CategoryList._();
 
   static List<String> getCategories() {
     return _categories;
   }
 
+static List<String> getIncomeCategories() {
+  return _categories.sublist(10,_categories.length);
+
+}
+
+static List<String> getExpenseCategories() {
+  return _categories.sublist(0,10);
+}
   static String getCategoryAt(int index) {
     return _categories[index];
   }

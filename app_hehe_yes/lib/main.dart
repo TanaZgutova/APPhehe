@@ -9,6 +9,7 @@ import 'profile_screen.dart';
 import 'income_screen.dart';
 import 'expense_screen.dart';
 import 'settings_screen.dart';
+
 void main() {
   runApp(const MyApp());
 }
@@ -70,6 +71,9 @@ class _HomeScreenState extends State<HomeScreen> {
   bool _finished = false;
 
   void _addTransaction(double amount, bool isIncome, int categoryIdx) async {
+    if (isIncome) {
+      categoryIdx += 10;
+    }
     await db.inserTransaction(TransactionsCompanion.insert(
       amount: amount,
       userID: _userData!.userID,
@@ -234,18 +238,20 @@ class _HomeScreenState extends State<HomeScreen> {
           List<Widget> screens = [
             StatsScreen(transactionHistory: _transactionHistory),
             HistoryScreen(transactionHistory: _transactionHistory),
-            ChallengesScreen(user: _userData!,achivements: _achievements),
+            ChallengesScreen(user: _userData!, achivements: _achievements),
             ProfileScreen(userData: _userData!, achievements: _achievements),
           ];
-          Navigator.push(
-              context, MaterialPageRoute(builder: (context) => screens[index])).then((_) async {
-                final user = await db.getUser(_userData!.userID);
-                final achievements = await db.getAchievementsOfUser(_userData!.userID);
-                setState(() {
-                  _userData = user;
-                  _achievements = achievements;
-                });
-              });
+          Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => screens[index]))
+              .then((_) async {
+            final user = await db.getUser(_userData!.userID);
+            final achievements =
+                await db.getAchievementsOfUser(_userData!.userID);
+            setState(() {
+              _userData = user;
+              _achievements = achievements;
+            });
+          });
         },
       ),
     );

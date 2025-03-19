@@ -138,7 +138,8 @@ class AppDatabase extends _$AppDatabase {
       AchievementsCompanion userAchivement, int userId) async {
     await transaction(
       () async {
-        await into(achievements).insert(userAchivement, mode: InsertMode.insertOrIgnore);
+        await into(achievements)
+            .insert(userAchivement, mode: InsertMode.insertOrIgnore);
         final userData = await getUser(userId);
         if (userData.level == 5) {
           return;

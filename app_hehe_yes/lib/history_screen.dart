@@ -27,7 +27,8 @@ class HistoryScreen extends StatelessWidget {
                     title: Text(
                       "${CategoryList.getCategoryAt(transaction.categoryIndex)} - \$${transaction.amount.toStringAsFixed(2)}",
                       style: TextStyle(
-                        color: transaction.withdraw ? Colors.green : Colors.red,
+                        color:
+                            !transaction.withdraw ? Colors.green : Colors.red,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
