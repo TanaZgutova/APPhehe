@@ -20,7 +20,6 @@ class SecureStorageService {
     if (uname == null && id == null) {
       return null;
     }
-    print("found him!");
     return SecureData(userName: uname!, id: int.tryParse(id!)!);
   }
 

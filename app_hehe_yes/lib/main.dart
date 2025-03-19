@@ -9,7 +9,6 @@ import 'profile_screen.dart';
 import 'income_screen.dart';
 import 'expense_screen.dart';
 import 'settings_screen.dart';
-
 void main() {
   runApp(const MyApp());
 }
@@ -81,7 +80,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   double _calculateMoney() {
     return _transactionHistory.fold(
-        0.0, (sum, e) => sum + (e.withdraw ? e.amount : -e.amount));
+        0.0, (sum, e) => sum + (e.withdraw ? -e.amount : e.amount));
   }
 
   Future<SecureData?> _getUserName() async {

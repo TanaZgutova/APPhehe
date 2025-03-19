@@ -33,6 +33,7 @@ dependencies:
   drift: ^2.0.0  # Latest version of Drift
   sqlite3: ^2.0.0  # SQLite3 package required for Drift
   path_provider: ^2.0.0  # For getting the correct file path on the device
+  sqlite3_flutter_libs: ^0.5.0
   path: ^1.8.0
   flutter_secure_storage: ^9.0.0
   # The following adds the Cupertino Icons font to your application.
