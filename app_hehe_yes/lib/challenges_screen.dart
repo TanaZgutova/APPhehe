@@ -69,7 +69,10 @@ class ChallengeTileState extends State<ChallengeTile> {
 
   @override
   Widget build(BuildContext context) {
-    isFinished = widget.complete;
+    if (widget.complete) {
+      isFinished = true;
+    }
+
     return ListTile(
       title: Text(widget.data.name),
       trailing: ElevatedButton(
@@ -77,9 +80,7 @@ class ChallengeTileState extends State<ChallengeTile> {
           if (isFinished) {
             return;
           }
-
           widget.completeChallenge(widget.index);
-
           setState(() {
             isFinished = true;
           });

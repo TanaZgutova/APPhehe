@@ -63,6 +63,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             value: _user.currencyIndex,
             onChanged: (int? newValue) async {
               final db = AppDatabase();
+
               await db.updateUserData(_user.userID, currencyIndex: newValue!);
               final userData = await db.getUser(_user.userID);
               setState(() {

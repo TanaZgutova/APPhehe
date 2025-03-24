@@ -16,13 +16,11 @@ class StatsScreen extends StatelessWidget {
     for (var transaction in transactionHistory) {
       if (transaction.withdraw) {
         final cat = CategoryList.getCategoryAt(transaction.categoryIndex);
-        categoryTotals[cat] =
-            (categoryTotals[cat] ?? 0) +
-                transaction.amount;
+        categoryTotals[cat] = (categoryTotals[cat] ?? 0) + transaction.amount;
       }
     }
-    var chartWidth = MediaQuery.of(context).size.width * 0.8;
-    var chartHeight = MediaQuery.of(context).size.height * 0.8;
+    final chartWidth = MediaQuery.of(context).size.width * 0.8;
+    final chartHeight = MediaQuery.of(context).size.height * 0.8;
     return Scaffold(
       appBar: AppBar(
           title: const Text("Spending Stats"),

@@ -91,20 +91,13 @@ class _HomeScreenState extends State<HomeScreen> {
     return await SecureStorageService.readSecureData("LOGIN");
   }
 
-  Future<int> _setUserName(String userName) async {
-    return await SecureStorageService.writeSecureData("LOGIN", userName);
-  }
-
   Future<void> _loadAppData() async {
     // await SecureStorageService.clearSecureData();
     var user = await _getUserName();
     if (user == null) {
-      //toto tu nebude ....
-      final uid = await _setUserName("MORE");
-      await db.insertUser(
-          UsersCompanion.insert(username: "MORE", hiddenValue: uid));
-      user = SecureData(userName: "MORE", id: uid);
+      return;
     }
+
     final userData = await db.loginUser(user.userName, user.id);
 
     if (userData.darkmode != widget.isDarkMode) {
@@ -138,11 +131,18 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     if (_finished && _userData == null) {
       // urob login obrazovku
-      return CircularProgressIndicator();
+      return Scaffold(
+        body: Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
     } else if (!_finished) {
-      return CircularProgressIndicator();
+      return Scaffold(
+        body: Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
     }
-
     return Scaffold(
       appBar: AppBar(
         title: const Text('Cash Quest'),

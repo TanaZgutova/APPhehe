@@ -37,8 +37,10 @@ class _IncomeScreenState extends State<IncomeScreen> {
                   selectedCategoryIdx = newValue!;
                 });
               },
-              items:
-                  CategoryList.getIncomeCategories().asMap().entries.map((category) {
+              items: CategoryList.getIncomeCategories()
+                  .asMap()
+                  .entries
+                  .map((category) {
                 return DropdownMenuItem<int>(
                     value: category.key, child: Text(category.value));
               }).toList(),
